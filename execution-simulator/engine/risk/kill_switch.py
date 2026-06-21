@@ -10,7 +10,7 @@ from utils.logger import (
     SystemLogger
 )
 
-from services.email_service import (
+from notifications.email_service import (
     EmailService
 )
 
@@ -161,7 +161,7 @@ class KillSwitch:
         # LOG EVENT
         # ====================================
 
-        self.logger.critical(
+        self.logger.error(
 
             f"KILL SWITCH ACTIVATED | "
 
@@ -172,12 +172,22 @@ class KillSwitch:
         # EMAIL ALERT
         # ====================================
 
-        self.email_service.send_kill_switch_alert(
+        try:
 
-            symbol="SYSTEM",
+            self.email_service.send_kill_switch_alert(
 
-            reason=reason
-        )
+                symbol="SYSTEM",
+
+                reason=reason
+            )
+
+        except Exception as e:
+
+            self.logger.error(
+
+                f"Email Alert Failed | "
+                f"{e}"
+            )
 
         # ====================================
         # PUBLISH EVENT
@@ -282,7 +292,7 @@ class KillSwitch:
 
 
     # ====================================
-    # PROCESS AI RESULT
+    # PROCESS AI RISK
     # ====================================
 
     def process_ai_risk(
@@ -302,11 +312,17 @@ class KillSwitch:
         )
 
         halt_execution = (
-            ai_result["halt_execution"]
+            ai_result.get(
+                "halt_execution",
+                False
+            )
         )
 
         reason = (
-            ai_result["reason"]
+            ai_result.get(
+                "reason",
+                "Unknown Risk"
+            )
         )
 
         recommended_action = (
@@ -366,6 +382,10 @@ class KillSwitch:
                 "AI recommends switching "
                 "to ICEBERG execution."
             )
+
+        # ====================================
+        # NORMAL STATE
+        # ====================================
 
         else:
 

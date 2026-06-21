@@ -11,21 +11,22 @@ import os
 
 PAPER_TRADING = True
 
-DATA_MODE = "replay"
+DATA_MODE = "fake"
 
 # replay
 # live
+# fake
 
 
 # ====================================
 # ALPACA API CONFIG
 # ====================================
 
-API_KEY = os.getenv(
+API_KEY = (
     "PKS775Q3SDJJEI5G5JUOHX5MNZ"
 )
 
-SECRET_KEY = os.getenv(
+SECRET_KEY = (
     "6ZQr11bvF52WoxT9uheVX3sSMWCALfmCHChhoCaRvFQG"
 )
 
@@ -34,7 +35,7 @@ SECRET_KEY = os.getenv(
 # FINNHUB CONFIG
 # ====================================
 
-FINNHUB_API_KEY = os.getenv(
+FINNHUB_API_KEY = (
     "d8psfupr01qtgb4j2dngd8psfupr01qtgb4j2do0"
 )
 
@@ -45,7 +46,7 @@ NEWS_PROVIDER = "finnhub"
 # DEEPSEEK CONFIG
 # ====================================
 
-DEEPSEEK_API_KEY = os.getenv(
+DEEPSEEK_API_KEY = (
     "sk-a5fd95bc870143afb3ff911b20c1d441"
 )
 

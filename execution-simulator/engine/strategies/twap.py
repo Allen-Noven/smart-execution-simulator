@@ -279,4 +279,3 @@ class TWAPStrategy:
             "total_minutes":
             self.total_minutes
         }
-``

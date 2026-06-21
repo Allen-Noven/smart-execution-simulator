@@ -16,7 +16,7 @@ from utils.constants import (
 from utils.logger import (
     SystemLogger
 )
-
+from core.redis_state import RedisState
 
 class AIRiskClassifier:
 
@@ -55,7 +55,11 @@ class AIRiskClassifier:
         self.url = (
             "https://api.deepseek.com/chat/completions"
         )
+# ====================================
+# REDIS STATE
+# ====================================
 
+        self.redis_state = RedisState()
 
     # ====================================
     # SAFE DEFAULT RESPONSE
@@ -325,6 +329,15 @@ Example:
 
                 f"{classification['severity']}"
             )
+            
+            # ====================================
+            # SYNC AI RISK TO REDIS
+            # ====================================
+
+            self.redis_state.set_ai_risk_result(
+                classification
+            )
+
 
             # ====================================
             # PUBLISH EVENT

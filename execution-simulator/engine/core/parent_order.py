@@ -72,6 +72,9 @@ class ParentOrder:
         self.side = side
 
         self.quantity = quantity
+        
+        self.total_qty = quantity
+
 
         self.strategy = strategy
 

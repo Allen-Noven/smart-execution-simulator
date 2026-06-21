@@ -20,9 +20,13 @@ sys.path.append(PROJECT_ROOT)
 
 import streamlit as st
 
-from core.global_state import (
-    system_state
-)
+# ====================================
+# INITIALIZE REDIS STATE
+# ====================================
+
+
+from core.redis_state import RedisState
+redis_state = RedisState()
 
 # ====================================
 # PAGE CONFIG
@@ -51,12 +55,111 @@ st.title(
 )
 
 # ====================================
+# MARKET DATA FROM REDIS
+# ====================================
+
+
+market_data = redis_state.get_market_state(
+    "NVDA"
+)
+ai_risk = redis_state.get_ai_risk_result()
+execution_summary = (
+    redis_state.get_execution_summary()
+)
+
+fills = redis_state.get_fills()
+
+execution_status = (
+    redis_state.get_execution_status()
+)
+
+alerts = redis_state.get_alerts()
+market_data = redis_state.get_market_state(
+    "NVDA"
+)
+
+ai_risk = redis_state.get_ai_risk_result()
+
+execution_summary = (
+    redis_state.get_execution_summary()
+)
+
+fills = redis_state.get_fills()
+
+execution_status = (
+    redis_state.get_execution_status()
+)
+
+alerts = redis_state.get_alerts()
+
+# ====================================
+# DEFAULT MARKET DATA
+# ====================================
+
+if market_data is None:
+
+    market_data = {
+
+        "price": 0,
+
+        "spread": 0,
+
+        "liquidity": 0
+    }
+
+# ====================================
+# DEFAULT AI RISK
+# ====================================
+
+if ai_risk is None:
+
+    ai_risk = {
+
+        "severity": "UNKNOWN",
+
+        "reason": "No AI risk data"
+    }
+
+# ====================================
+# DEFAULT EXECUTION SUMMARY
+# ====================================
+
+if execution_summary is None:
+
+    execution_summary = {
+
+        "strategy": "N/A",
+
+        "filled_qty": 0,
+
+        "remaining_qty": 0,
+
+        "completion": 0
+    }
+
+# ====================================
+# DEFAULT EXECUTION STATUS
+# ====================================
+
+if execution_status is None:
+
+    execution_status = {
+
+        "status": "UNKNOWN",
+
+        "halted": False,
+
+        "reason": None
+    }
+
+# ====================================
 # MARKET STATE
 # ====================================
 
 st.subheader(
     "Market State"
 )
+
 
 col1, col2, col3 = (
     st.columns(3)
@@ -66,21 +169,21 @@ col1.metric(
 
     "Price",
 
-    system_state.market_state.current_price
+    market_data["price"]
 )
 
 col2.metric(
 
     "Spread",
 
-    system_state.market_state.spread
+    market_data["spread"]
 )
 
 col3.metric(
 
     "Liquidity",
 
-    system_state.market_state.liquidity_score
+    market_data["liquidity"]
 )
 
 # ====================================
@@ -91,10 +194,7 @@ st.subheader(
     "Execution"
 )
 
-st.write(
-
-    system_state.execution_summary
-)
+st.write(execution_summary)
 
 # ====================================
 # FILLS
@@ -104,10 +204,7 @@ st.subheader(
     "Recent Fills"
 )
 
-st.table(
-
-    system_state.fills[-5:]
-)
+st.table(fills[-5:])
 
 # ====================================
 # AI RISK
@@ -117,34 +214,52 @@ st.subheader(
     "AI Risk"
 )
 
-st.json(
-
-    system_state.ai_risk_result
-)
+st.json(ai_risk)
 
 # ====================================
 # EXECUTION STATUS
 # ====================================
 
+if execution_status:
+    
+    st.subheader(
+        "Execution Status"
+    )
+
+    if execution_status["halted"]:
+
+        st.error(
+
+            f"HALTED | "
+
+            f"{execution_status['reason']}"
+        )
+
+    else:
+
+        st.success(
+
+            execution_status["status"]
+        )
+# ====================================
+# ALERTS
+# ====================================
+
 st.subheader(
-    "Execution Status"
+    "Alerts"
 )
 
-if system_state.execution_halted:
+if len(alerts) == 0:
 
-    st.error(
-
-        f"HALTED | "
-
-        f"{system_state.halt_reason}"
+    st.success(
+        "No Active Alerts"
     )
 
 else:
 
-    st.success(
-        "RUNNING"
-    )
+    for alert in alerts[-5:]:
 
+        st.warning(alert)
 # ====================================
 # REFRESH BUTTON
 # ====================================

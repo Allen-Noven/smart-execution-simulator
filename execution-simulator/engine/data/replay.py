@@ -39,8 +39,10 @@ class MarketReplay:
         )
 
         self.df = pd.read_csv(
-            data_path
+            data_path,encoding="utf-8-sig"
         )
+        self.df.columns = (self.df.columns.str.strip())
+        print(self.df.columns)
 
         self.market_state = (
             market_state
